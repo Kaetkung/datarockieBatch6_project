@@ -1,0 +1,78 @@
+---
+title: "predictive survivor titanic"
+author: "kaet"
+date: "2022-12-08"
+output: html_document
+---
+
+library
+```{r}
+library(tidyverse)
+library(titanic)
+library(caret)
+```
+
+Check data and NA
+```{r}
+glimpse(titanic_train)
+tibble(titanic_train)
+apply(titanic_train, MARGIN = 2, function(col) sum(is.na(col)))
+```
+
+Drop NA
+```{r}
+titanic_train <- na.omit(titanic_train)
+nrow(titanic_train)
+```
+
+Change Sex column into factor
+```{r}
+titanic_train$Sex <- as.factor(titanic_train$Sex)
+```
+
+Split data
+```{r}
+set.seed(2)
+n <- nrow(titanic_train)
+id <- sample(1:n, size = n*0.8)
+train_data <- titanic_train[id,]
+test_data <- titanic_train[-id,]
+```
+
+Check split data
+```{r}
+nrow(train_data)
+nrow(test_data)
+```
+
+
+train model
+```{r}
+model <- glm(Survived ~ Pclass + Age + Sex, data = train_data, family = "binomial")
+# Predictive and Evaluate Model
+train_prob_survived <- predict(model,type = "response")
+train_data$pred_survived <- ifelse(train_prob_survived >= 0.5,1,0)
+##Confusion Matrix
+conMetric <- table(train_data$pred_survived, train_data$Survived, dnn = c("Predicted","Actuall"))
+##Model evaluation
+train_a <- (conMetric[1,1] + conMetric[2,2])/ sum(conMetric)
+train_p <- conMetric[2,2] / (conMetric[2,2] + conMetric[2,1])
+train_r <- conMetric[2,2]/(conMetric[1,2]+conMetric[2,2])
+cat("Acculacy:",train_a,"\nPrecision:",train_p,"\nRecall",train_r)
+```
+
+test model
+```{r}
+test_prob_survived <- predict(model, newdata = test_data, type = "response")
+test_data$pred_survived <- ifelse(test_prob_survived >= 0.5,1,0)
+##Confusion Matrix
+conMatrix2 <- table(test_data$pred_survived, test_data$Survived,dnn = c("Predicted","Actuall"))
+##Model evaluation
+test_a <- (conMatrix2[1,1] + conMatrix2[2,2])/ sum(conMatrix2)
+test_p <- conMatrix2[2,2] / (conMatrix2[2,2] + conMatrix2[2,1])
+test_r <- conMatrix2[2,2]/(conMatrix2[1,2]+conMatrix2[2,2])
+cat("Acculacy:",test_a,"\nPrecision:",test_p,"\nRecall",test_r)
+```
+
+
+
