@@ -7,7 +7,7 @@ output: html_document
 
 Context: This dataset is E.coli(microbe) DNA. The objective is to QC-check data exploration by ggplot
 
-Data Source: https://raw.githubusercontent.com/Kaetkung/datarockieBatch6_project/main/var_vcf.csv
+Data Source: https://raw.githubusercontent.com/Kaetkung/datarockieBatch6_project_1/main/ggplot_project/var_vcf.csv
 
 library we use.
 ```{r}
